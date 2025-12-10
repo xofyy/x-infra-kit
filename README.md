@@ -151,6 +151,22 @@ cdktf deploy   # Apply to GCP
 - Google Cloud SDK (`gcloud`)
 - Terraform 1.0+ (installed automatically by cdktf)
 
+### Enable Required GCP APIs
+
+Before deploying, enable the required APIs in your GCP project:
+
+```bash
+# Required APIs
+gcloud services enable compute.googleapis.com --project=YOUR_PROJECT_ID
+gcloud services enable container.googleapis.com --project=YOUR_PROJECT_ID
+
+# Optional (if using secrets and workload identity)
+gcloud services enable secretmanager.googleapis.com --project=YOUR_PROJECT_ID
+gcloud services enable iam.googleapis.com --project=YOUR_PROJECT_ID
+```
+
+> **Note**: Your GCP project must allow the region you're deploying to. Check organization policies if you encounter "LOCATION_POLICY_VIOLATED" errors.
+
 ### Install from source
 
 ```bash
