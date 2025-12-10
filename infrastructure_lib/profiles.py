@@ -4,23 +4,25 @@ Platform Profiles (Golden Paths) for different environments.
 Profiles define sensible defaults for Dev, Staging, and Production environments.
 Each profile can be customized via override parameters.
 """
+
 from typing import Any
+
 from .config import ClusterConfig, NetworkConfig
 
 
 class PlatformProfile:
     """
     Base class for Platform Profiles (Golden Paths).
-    
+
     Enforces naming conventions and provides common configuration patterns.
-    
+
     Args:
         project_id: GCP project ID
         region: GCP region (e.g., europe-west1)
         env: Environment name (dev, staging, prod)
         prefix: Resource naming prefix (e.g., myapp)
     """
-    
+
     def __init__(self, project_id: str, region: str, env: str, prefix: str):
         self.project_id = project_id
         self.region = region
@@ -30,20 +32,16 @@ class PlatformProfile:
     @property
     def common_labels(self) -> dict:
         """Standard labels applied to all resources."""
-        return {
-            "environment": self.env,
-            "managed-by": "cdktf",
-            "project": self.project_id
-        }
+        return {"environment": self.env, "managed-by": "cdktf", "project": self.project_id}
 
     def get_network_config(self, **overrides: Any) -> NetworkConfig:
         """
         Get network configuration with optional overrides.
-        
+
         Args:
             **overrides: Override any NetworkConfig parameter
                         (e.g., cidr="10.1.0.0/16")
-        
+
         Returns:
             NetworkConfig instance
         """
@@ -66,18 +64,18 @@ class PlatformProfile:
 class DevProfile(PlatformProfile):
     """
     Development Profile: Cost-optimized, relaxed availability.
-    
+
     Features:
     - Single zone deployment
     - Spot/Preemptible instances enabled
     - Smaller machine types
     - Lower node count limits
     """
-    
+
     def get_cluster_config(self, **overrides: Any) -> ClusterConfig:
         """
         Get dev-optimized cluster configuration.
-        
+
         Default settings:
         - machine_type: e2-medium (cost-effective)
         - max_nodes: 3 (limited scaling)
@@ -102,18 +100,18 @@ class DevProfile(PlatformProfile):
 class ProdProfile(PlatformProfile):
     """
     Production Profile: High Availability, Performance, Stability.
-    
+
     Features:
     - Higher node counts for HA
     - No spot instances (stability)
     - Larger machine types
     - Higher disk sizes
     """
-    
+
     def get_cluster_config(self, **overrides: Any) -> ClusterConfig:
         """
         Get production-optimized cluster configuration.
-        
+
         Default settings:
         - machine_type: n2-standard-4 (balanced performance)
         - min_nodes: 3 (HA guarantee)
@@ -139,17 +137,17 @@ class ProdProfile(PlatformProfile):
 class StagingProfile(PlatformProfile):
     """
     Staging Profile: Production-like but cost-conscious.
-    
+
     Features:
     - Similar to prod for testing
     - Slightly smaller resources
     - Spot instances allowed
     """
-    
+
     def get_cluster_config(self, **overrides: Any) -> ClusterConfig:
         """
         Get staging cluster configuration.
-        
+
         Default settings:
         - machine_type: n2-standard-2 (smaller than prod)
         - min_nodes: 2

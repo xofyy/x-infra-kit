@@ -5,7 +5,7 @@ This library provides production-ready infrastructure constructs for Google Clou
 
 Quick Start:
     from x_infra_kit import StandardPlatform
-    
+
     platform = StandardPlatform(stack, "platform",
         project_id="my-project",
         region="europe-west1",
@@ -15,7 +15,7 @@ Quick Start:
 
 Building Blocks (for advanced usage):
     from x_infra_kit import StandardVPC, StandardCluster, DevProfile
-    
+
     profile = DevProfile(project_id, region, env, prefix)
     vpc = StandardVPC(self, "vpc", config=profile.get_network_config())
     cluster = StandardCluster(self, "gke", config=profile.get_cluster_config(), ...)
@@ -24,23 +24,23 @@ Building Blocks (for advanced usage):
 # Composite (Recommended for most users)
 from .composites import StandardPlatform
 
+# Configuration
+from .config import ClusterConfig, NetworkConfig
+from .gke import StandardCluster
+
 # Building Blocks
 from .networking import StandardVPC
-from .gke import StandardCluster
-from .security import StandardSecrets, StandardIdentity
-
-# Configuration
-from .config import NetworkConfig, ClusterConfig
 
 # Profiles (Golden Paths)
-from .profiles import PlatformProfile, DevProfile, StagingProfile, ProdProfile
+from .profiles import DevProfile, PlatformProfile, ProdProfile, StagingProfile
+from .security import StandardIdentity, StandardSecrets
 
 __all__ = [
     # Composite
     "StandardPlatform",
     # Building Blocks
     "StandardVPC",
-    "StandardCluster", 
+    "StandardCluster",
     "StandardSecrets",
     "StandardIdentity",
     # Config
