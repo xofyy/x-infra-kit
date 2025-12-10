@@ -11,7 +11,7 @@ from constructs import Construct
 
 from .gke import StandardCluster
 from .networking import StandardVPC
-from .profiles import DevProfile, ProdProfile, StagingProfile
+from .profiles import DevProfile, PlatformProfile, ProdProfile, StagingProfile
 from .security import StandardIdentity, StandardSecrets
 
 
@@ -90,6 +90,7 @@ class StandardPlatform(Construct):
         self.prefix = prefix
 
         # 1. Select profile based on environment
+        profile: PlatformProfile
         if env == "prod":
             profile = ProdProfile(project_id, region, env, prefix)
         elif env == "staging":
@@ -123,13 +124,22 @@ class StandardPlatform(Construct):
         # 5. Create Workload Identity (optional)
         self._identity = None
         if workload_identity:
+            sa_id = workload_identity.get("sa_id")
+            k8s_namespace = workload_identity.get("k8s_namespace")
+            k8s_sa_name = workload_identity.get("k8s_sa_name")
+
+            if not sa_id or not k8s_namespace or not k8s_sa_name:
+                raise ValueError(
+                    "workload_identity must contain 'sa_id', 'k8s_namespace', and 'k8s_sa_name'"
+                )
+
             self._identity = StandardIdentity(
                 self,
                 "identity",
                 project_id=project_id,
-                sa_id=workload_identity.get("sa_id"),
-                k8s_namespace=workload_identity.get("k8s_namespace"),
-                k8s_sa_name=workload_identity.get("k8s_sa_name"),
+                sa_id=sa_id,
+                k8s_namespace=k8s_namespace,
+                k8s_sa_name=k8s_sa_name,
                 roles=workload_identity.get("roles", []),
             )
 
